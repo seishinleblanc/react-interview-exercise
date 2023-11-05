@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import {
     Button,
     Center,
@@ -24,6 +24,7 @@ const Home: React.FC = () => {
     const [searching, setSearching] = React.useState(false)
     const [districtSearch, setDistrictSearch] = React.useState<NCESDistrictFeatureAttributes[]>([]);
     const [schoolSearch, setSchoolSearch] = React.useState<NCESSchoolFeatureAttributes[]>([]);
+    const [query, setQuery] = useState("");
     
     const demo = async () => { // see console for api result examples
         setSearching(true)
@@ -31,7 +32,7 @@ const Home: React.FC = () => {
         setDistrictSearch(demoDistrictSearch)
         console.log("District example", demoDistrictSearch)
 
-        const demoSchoolSearch = await searchSchools("k", demoDistrictSearch[1].LEAID)
+        const demoSchoolSearch = await searchSchools(query, demoDistrictSearch[1].LEAID)
         setSchoolSearch(demoSchoolSearch)
         console.log("School Example", demoSchoolSearch)
         setSearching(false)
@@ -39,7 +40,7 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         demo()
-    }, [])
+    }, [query])
     
     return (
         <Center padding="100px" height="90vh">
@@ -61,6 +62,12 @@ const Home: React.FC = () => {
                         {searching ? <Spinner /> : <></>}< br />
                         {districtSearch.length} Demo Districts<br />
                         {schoolSearch.length} Demo Schools<br />
+                        <>Search: 
+                        <input value={query} onChange={e => setQuery(e.target.value)} type="search" />
+                        <ul>
+                            {schoolSearch.map(value => <h1>{value.NAME}</h1>)}
+                        </ul>
+                        </>
                     </Text>
                 </Card>
             </ScaleFade>
