@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react"
 import { Card } from '@components/design/Card'
 import { searchSchoolDistricts, searchSchools, NCESDistrictFeatureAttributes, NCESSchoolFeatureAttributes } from "@utils/nces"
+import Pagination from "./Pagination"
 
 
 const Home: React.FC = () => {
@@ -25,20 +26,29 @@ const Home: React.FC = () => {
     const [districtSearch, setDistrictSearch] = React.useState<NCESDistrictFeatureAttributes[]>([]);
     const [schoolSearch, setSchoolSearch] = React.useState<NCESSchoolFeatureAttributes[]>([]);
     const [query, setQuery] = useState("");
+    const [schoolQuery, SetSchoolQuery] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState(0);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [districtsPerPage, setDistrictsPerPage] = useState(10);
+    const lastDistrictIndex = currentPage * districtsPerPage;
+    const firstDistrictIndex = lastDistrictIndex - districtsPerPage;
+    const currentDistricts = districtSearch.slice(firstDistrictIndex, lastDistrictIndex);
     
     const demo = async () => { // see console for api result examples
         setSearching(true)
-        const demoDistrictSearch = await searchSchoolDistricts("Peninsula School District")
+        const demoDistrictSearch = await searchSchoolDistricts(query)
         setDistrictSearch(demoDistrictSearch)
         console.log("District example", demoDistrictSearch)
 
-        const demoSchoolSearch = await searchSchools(query, demoDistrictSearch[1].LEAID)
+        const demoSchoolSearch = await searchSchools(schoolQuery, demoDistrictSearch[1].LEAID)
         setSchoolSearch(demoSchoolSearch)
         console.log("School Example", demoSchoolSearch)
         setSearching(false)
     }
 
     useEffect(() => {
+        if(query !=="")
         demo()
     }, [query])
     
@@ -60,13 +70,26 @@ const Home: React.FC = () => {
                     <Text>
                         Check the console for example of returned data. <b>Happy coding!</b>< br />
                         {searching ? <Spinner /> : <></>}< br />
-                        {districtSearch.length} Demo Districts<br />
-                        {schoolSearch.length} Demo Schools<br />
+                        {districtSearch.length} Districts Found<br />
+                        {/* {schoolSearch.length} Demo Schools<br /> */}
                         <>Search: 
-                        <input value={query} onChange={e => setQuery(e.target.value)} type="search" />
-                        <ul>
-                            {schoolSearch.map(value => <h1>{value.NAME}</h1>)}
-                        </ul>
+                        <input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." />
+                        <VStack>
+                            {currentDistricts.map((value, index) => {
+                            return (
+                            <button
+                            key={index}
+                            onClick={() => console.log(value.LEAID)}
+                            >{value.NAME}</button>
+                            );
+                            })} 
+                            <Pagination 
+                            totalDistricts={districtSearch.length} 
+                            districtsPerPage={districtsPerPage} 
+                            setCurrentPage={setCurrentPage} 
+                            currentPage={currentPage} 
+                            />
+                        </VStack>
                         </>
                     </Text>
                 </Card>
