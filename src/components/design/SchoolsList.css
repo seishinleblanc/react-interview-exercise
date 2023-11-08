@@ -1,0 +1,8 @@
+.cardBox {
+    border: solid 2px #42e896;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    width: 50vw;
+    background: #42e896;
+  }
