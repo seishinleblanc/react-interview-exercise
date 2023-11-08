@@ -29,37 +29,46 @@ const Home: React.FC = () => {
     const [schoolSearchBypass, setSchoolSearchBypass] = React.useState<NCESSchoolFeatureAttributes[]>([]);
     const [query, setQuery] = useState("");
     const [schoolQuery, SetSchoolQuery] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState(0);
+    const [selectedDistrict, setSelectedDistrict] = useState("");
     const [districtChecked, setDistrictChecked] = useState(false);
     const [schoolChecked, setSchoolChecked] = useState(false);
 
     const [showSchools, setShowSchools] = useState(false);
 
+    // The following are pagination related useStates and variables
     const [currentPage, setCurrentPage] = useState(1);
-    const [districtsPerPage, setDistrictsPerPage] = useState(10);
+    const [resultsPerPage, setResultsPerPage] = useState(10);
 
-    const lastDistrictIndex = currentPage * districtsPerPage;
-    const firstDistrictIndex = lastDistrictIndex - districtsPerPage;
-    const currentDistricts = districtSearch.slice(firstDistrictIndex, lastDistrictIndex);
-
-    // const currentSchools = schoolSearchBypass.slice(firstResultIndex, lastResultIndex);
+    const lastResultIndex = currentPage * resultsPerPage;
+    const firstResultIndex = lastResultIndex - resultsPerPage;
+    const currentDistricts = districtSearch.slice(firstResultIndex, lastResultIndex);
+    const currentSchools = schoolSearchBypass.slice(firstResultIndex, lastResultIndex);
+    const schoolsInDistrict = schoolSearch.slice(firstResultIndex, lastResultIndex);
     
     const demo = async () => { // see console for api result examples
-        setSearching(true)
-        const demoDistrictSearch = await searchSchoolDistricts(query)
-        setDistrictSearch(demoDistrictSearch)
-        console.log("District example", demoDistrictSearch)
+        if (schoolChecked) {
+            const schoolSearchBypassData = await searchSchools(query)
+            setSchoolSearchBypass(schoolSearchBypassData)
+            console.log("School Bypass Data:", schoolSearchBypassData)
+        } else  {
 
-        const demoSchoolSearch = await searchSchools(schoolQuery, demoDistrictSearch[1].LEAID)
-        setSchoolSearch(demoSchoolSearch)
-        console.log("School Example", demoSchoolSearch)
-        setSearching(false)
+            setSearching(true)
+            const demoDistrictSearch = await searchSchoolDistricts(query)
+            setDistrictSearch(demoDistrictSearch)
+            console.log("District example", demoDistrictSearch)
+            
+            const demoSchoolSearch = await searchSchools(schoolQuery, demoDistrictSearch[0].LEAID)
+            setSchoolSearch(demoSchoolSearch)
+            console.log("School Example", demoSchoolSearch)
+            setSearching(false)
+        }
     }
 
     const handleOnClick = async (district) => {
         setQuery(district);
         setSearching(false);
         setShowSchools(true);
+        setSelectedDistrict(district);
         
 
         // const clickedQuery = district
@@ -80,18 +89,19 @@ const Home: React.FC = () => {
 
     const handleChangeSchool = async () => {
         setSchoolChecked(!schoolChecked);
-        const schoolSearchBypassData = await searchSchools(query)
-        setSchoolSearchBypass(schoolSearchBypassData)
-        console.log("School Example 2:", schoolSearchBypassData)
         setSearching(false)
         setDistrictChecked(false);
 
     }
 
+    const handleReturnToSearch = () => {
+        setShowSchools(false);
+    }
+
     useEffect(() => {
         if(query !=="" && (districtChecked || schoolChecked) )
         demo()
-    }, [query])
+    }, [query, districtChecked, schoolChecked])
     
     return (
         <Center padding="100px" height="90vh">
@@ -113,7 +123,8 @@ const Home: React.FC = () => {
                         {searching ? <Spinner /> : <></>}< br />
                         {/* {schoolSearch.length} Demo Schools<br /> */}
                         <>Search: 
-                        <input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." />
+                        <Input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." />
+                        <br />
                             <input 
                             type="checkbox"
                             checked={districtChecked}
@@ -125,9 +136,11 @@ const Home: React.FC = () => {
                             onChange={handleChangeSchool}
                              />Schools <br />
 
-                             
+                        {/* If we search by districts, we return the following: */}
+
                         {districtChecked && <VStack> 
-                            <div>
+                        {!showSchools && <>
+                        <div>
                         <br /> {districtSearch.length} Districts Found <br />
                         </div>
                             {currentDistricts.map((value, index) => {
@@ -138,28 +151,58 @@ const Home: React.FC = () => {
                             >{value.NAME}</button>
                             );
                             })} 
-                            {showSchools && 
-                            <SchoolsList
-                            schoolSearch={schoolSearch} /> }
+                            <Divider margin={4} />
                             <Pagination 
-                            totalDistricts={districtSearch.length} 
-                            districtsPerPage={districtsPerPage} 
+                            totalResults={districtSearch.length} 
+                            resultsPerPage={resultsPerPage} 
                             setCurrentPage={setCurrentPage} 
                             currentPage={currentPage} 
-                            />
-                        </VStack> }
+                            /> </>}
+                            
+                            <div>
+                            {showSchools && 
+                            <SchoolsList
+                            schoolSearch={schoolsInDistrict}
+                            districtSearch={selectedDistrict} /> }
+                            {showSchools && <Button
+                            onClick={handleReturnToSearch}
+                            >
+                                Return to Search
+                            </Button> }
+
+                            {showSchools && <Pagination 
+                            totalResults={schoolSearch.length} 
+                            resultsPerPage={resultsPerPage} 
+                            setCurrentPage={setCurrentPage} 
+                            currentPage={currentPage} 
+                            /> }
+                            </div>
+                        </VStack> } 
+
+                        {/* If we search by schools, we return the following: */}
 
                         {schoolChecked && <VStack>
                             <div>
                            {schoolSearchBypass.length} Schools Found
                            </div>
-                           {schoolSearchBypass.slice(0,25).map((value) => {
+                           {currentSchools.map((value) => {
                             return(
                                 <div>
                                 {value.NAME}
+                                {/* <h2> 
+                                {value.CITY}, {value.STATE}
+                                </h2> */}
                                 </div>
+                                
                             );
                            })}
+                           <Divider margin={4} />
+                           <Pagination
+                            totalResults={schoolSearchBypass.length} 
+                            resultsPerPage={resultsPerPage} 
+                            setCurrentPage={setCurrentPage} 
+                            currentPage={currentPage} 
+                           />
                         </VStack> }
 
 
