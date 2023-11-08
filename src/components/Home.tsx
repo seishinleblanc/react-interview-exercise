@@ -14,12 +14,23 @@ import {
     InputGroup, // Some Chakra components that might be usefull
     HStack,
     VStack,
+    StackDivider,
     InputRightAddon,
+    InputLeftElement,
+    Menu,
+    MenuItem,
+    MenuButton,
+    MenuList,
+    MenuOptionGroup,
+    MenuItemOption
 } from "@chakra-ui/react"
+import { BsSearchHeart } from "react-icons/bs"
+
 import { Card } from '@components/design/Card'
 import { searchSchoolDistricts, searchSchools, NCESDistrictFeatureAttributes, NCESSchoolFeatureAttributes } from "@utils/nces"
 import Pagination from "./Pagination"
 import SchoolsList from "./SchoolsList"
+import "./design/SchoolsList.css";
 
 
 const Home: React.FC = () => {
@@ -30,15 +41,14 @@ const Home: React.FC = () => {
     const [query, setQuery] = useState("");
     const [schoolQuery, SetSchoolQuery] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [districtChecked, setDistrictChecked] = useState(false);
+    const [districtChecked, setDistrictChecked] = useState(true);
     const [schoolChecked, setSchoolChecked] = useState(false);
 
     const [showSchools, setShowSchools] = useState(false);
 
     // The following are pagination related useStates and variables
     const [currentPage, setCurrentPage] = useState(1);
-    const [resultsPerPage, setResultsPerPage] = useState(10);
-
+    const [resultsPerPage, setResultsPerPage] = useState(5);
     const lastResultIndex = currentPage * resultsPerPage;
     const firstResultIndex = lastResultIndex - resultsPerPage;
     const currentDistricts = districtSearch.slice(firstResultIndex, lastResultIndex);
@@ -91,24 +101,25 @@ const Home: React.FC = () => {
         setSchoolChecked(!schoolChecked);
         setSearching(false)
         setDistrictChecked(false);
-
     }
 
     const handleReturnToSearch = () => {
         setShowSchools(false);
+        setCurrentPage(1);
     }
 
     useEffect(() => {
         if(query !=="" && (districtChecked || schoolChecked) )
-        demo()
+        demo();
+        setCurrentPage(1);
     }, [query, districtChecked, schoolChecked])
     
     return (
-        <Center padding="100px" height="90vh">
+        <Center padding="100px" height="132vh">
             <ScaleFade initialScale={0.9} in={true}>
-                <Card variant="rounded" borderColor="blue">
+                <Card variant="rounded" borderColor="#F45746">
                     <Heading>School Data Finder</Heading>
-                    <Text>
+                    {/* <Text>
                         How would you utilize React.useEffect with the searchSchoolDistricts and searchSchools functions? <br />
                         Using <a href="https://chakra-ui.com/docs/principles" target="_blank">Chakra-UI</a> or your favorite UI toolkit, build an interface that allows the user to: <br />
                         <OrderedList>
@@ -116,50 +127,69 @@ const Home: React.FC = () => {
                             <ListItem>Search for a school within the district (or bypass district filter)</ListItem>
                             <ListItem>View all returned data in an organized way</ListItem>
                         </OrderedList>
-                    </Text>
+                    </Text> */}
                     <Divider margin={4} />
                     <Text>
-                        Check the console for example of returned data. <b>Happy coding!</b>< br />
+                        {/* Check the console for example of returned data. <b>Happy coding!</b>< br /> */}
                         {searching ? <Spinner /> : <></>}< br />
-                        {/* {schoolSearch.length} Demo Schools<br /> */}
-                        <>Search: 
-                        <Input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." />
-                        <br />
-                            <input 
-                            type="checkbox"
-                            checked={districtChecked}
-                            onChange={handleChangeDistrict}
-                             />Districts 
-                              <input 
-                            type="checkbox"
-                            checked={schoolChecked}
-                            onChange={handleChangeSchool}
-                             />Schools <br />
+                        <>
 
+                        {!showSchools && <InputGroup>
+                        <InputLeftElement pointerEvents='none'>
+                            <Icon as={BsSearchHeart} />
+                        </InputLeftElement>
+                        <Input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." focusBorderColor="#F45746" />
+                        <Menu>
+                            <MenuButton as={Button} colorScheme='#F45746'>Filters
+                            </MenuButton>
+                            <MenuList>
+                                <MenuOptionGroup defaultValue='dis' title='Filters' type='radio'>
+                                <MenuItemOption onClick={handleChangeDistrict} value='dis'>Districts</MenuItemOption>
+                                <MenuItemOption onClick={handleChangeSchool} value='sch'>Schools</MenuItemOption>
+                                </MenuOptionGroup>
+                            </MenuList>
+                        </Menu>
+                        </InputGroup> }
+                        <br/>
+                        
                         {/* If we search by districts, we return the following: */}
 
                         {districtChecked && <VStack> 
                         {!showSchools && <>
-                        <div>
+                        <Heading>
                         <br /> {districtSearch.length} Districts Found <br />
-                        </div>
+                        </Heading>
+                        <Divider margin={4} />
+                    
+                        <VStack
+                        divider={<StackDivider borderColor='gray.200' />}
+                        spacing={1}
+                        align='stretch'
+                        > 
                             {currentDistricts.map((value, index) => {
-                            return (
-                            <button
-                            key={index}
-                            onClick={(district) => handleOnClick(value.NAME)}
-                            >{value.NAME}</button>
-                            );
+                                return (
+                                    <div className="cardBox">
+                                    <button
+                                    key={index}
+                                    onClick={(district) => handleOnClick(value.NAME)}
+                                    ><b>{value.NAME}</b><Text>Located in {value.LCITY}, {value.LSTATE}</Text>
+                                    </button>
+                                    </div>
+                                );
                             })} 
-                            <Divider margin={4} />
-                            <Pagination 
+                        </VStack>
+                        
+                        <Divider margin={4} />
+                        <Pagination 
                             totalResults={districtSearch.length} 
                             resultsPerPage={resultsPerPage} 
                             setCurrentPage={setCurrentPage} 
                             currentPage={currentPage} 
-                            /> </>}
+                        /> </>}
+
+                        {/* When we click on a specific district, it renders the schools within the district using this: */}
                             
-                            <div>
+                            <VStack>
                             {showSchools && 
                             <SchoolsList
                             schoolSearch={schoolsInDistrict}
@@ -176,26 +206,35 @@ const Home: React.FC = () => {
                             setCurrentPage={setCurrentPage} 
                             currentPage={currentPage} 
                             /> }
-                            </div>
+                            </VStack>
                         </VStack> } 
 
                         {/* If we search by schools, we return the following: */}
 
                         {schoolChecked && <VStack>
-                            <div>
+                            <Heading>
                            {schoolSearchBypass.length} Schools Found
-                           </div>
-                           {currentSchools.map((value) => {
-                            return(
-                                <div>
-                                {value.NAME}
-                                {/* <h2> 
-                                {value.CITY}, {value.STATE}
-                                </h2> */}
-                                </div>
-                                
-                            );
-                           })}
+                           </Heading>
+                            <Divider margin={4} />
+                            
+                            
+                            <VStack
+                            divider={<StackDivider borderColor='gray.200' />}
+                            spacing={1}
+                            align='center'
+                            > 
+                            {currentSchools.map((value) => {
+                                    return(
+                                        <div className="cardBox">
+                                        <b>{value.NAME}</b> <br/>
+                                        Located at {value.STREET},
+                                        {value.CITY}, {value.STATE}, {value.ZIP}
+                                        </div>
+                                        
+                                    );
+                                })}
+                            </VStack>
+
                            <Divider margin={4} />
                            <Pagination
                             totalResults={schoolSearchBypass.length} 

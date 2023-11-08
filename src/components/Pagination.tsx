@@ -1,5 +1,7 @@
 import React from 'react'
 import "./design/Pagination.css";
+import { Icon } from '@chakra-ui/react';
+import { GrFormNext, GrFormPrevious } from 'react-icons/gr'
 
 // Pagination component added in order to deal with large amount of returned data
 
@@ -19,7 +21,7 @@ const Pagination = ({totalResults, resultsPerPage, setCurrentPage, currentPage})
       { (currentPage > 1) ?
         <button
           onClick={() => setCurrentPage(currentPage -1)}
-          > {'<'} 
+          > <Icon as={GrFormPrevious} />
         </button> : null 
       }
       { (currentPage > 5) ?
@@ -50,7 +52,7 @@ const Pagination = ({totalResults, resultsPerPage, setCurrentPage, currentPage})
       { (currentPage < totalPages) ?
         <button
           onClick={() => setCurrentPage(currentPage +1)}
-          > {'>'} 
+          > <Icon as={GrFormNext} />
         </button> : null 
       }
     </div>

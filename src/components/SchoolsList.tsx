@@ -1,17 +1,33 @@
-import React from 'react'
+import React from 'react';
+import { 
+    Heading,
+    VStack, 
+    StackDivider,
+    Text 
+} from "@chakra-ui/react";
+import "./design/SchoolsList.css";
 
 const SchoolsList = ({schoolSearch, districtSearch}) => {
     return (
-       <> <h1>District: {districtSearch}</h1>
-        <h1>Schools within District:</h1>
+       <VStack>
+       <Heading>{districtSearch}</Heading>
+        <Text>Schools within District:</Text>
+        <VStack
+            divider={<StackDivider borderColor='gray.200' />}
+            spacing={1}
+            align='center'
+        > 
         {schoolSearch.map((value) => {
                     return (
-                        <>
-                    <h3>{value.NAME}</h3>
-                    </>
+                        <div className="cardBox">
+                     <b>{value.NAME}</b><br/>
+                    Located at {value.STREET},
+                     {value.CITY}, {value.STATE}, {value.ZIP}
+                    </div>
                     );
                     })} 
-                    </>
+        </VStack>
+        </VStack>
 )
 }
 
