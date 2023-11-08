@@ -18,43 +18,53 @@ const Pagination = ({totalResults, resultsPerPage, setCurrentPage, currentPage})
     }
   return (
     <div className="pagination">
-      { (currentPage > 1) ?
-        <button
-          onClick={() => setCurrentPage(currentPage -1)}
-          > <Icon as={GrFormPrevious} />
-        </button> : null 
-      }
-      { (currentPage > 5) ?
-        <button
-          onClick={() => setCurrentPage(1)}
-        >
-        1
-        </button> : null 
-      }
-      {pages.slice(rangeStart,rangeEnd).map((page, index) => {
-        return (
-        <button 
-          key={index} 
-          onClick={() => setCurrentPage(page)} 
-          className={page == currentPage ? "active" : ""}
-          > {page}
-        </button>
-        ); 
-        })
-      } 
-      { ((currentPage + 3) < totalPages) ?
-        <button
-          onClick={() => setCurrentPage(totalPages)}
-        >
-        {totalPages}
-        </button> : null 
-      }
-      { (currentPage < totalPages) ?
-        <button
-          onClick={() => setCurrentPage(currentPage +1)}
-          > <Icon as={GrFormNext} />
-        </button> : null 
-      }
+      
+      {/* The previous button */}
+        { (currentPage > 1) ?
+          <button
+            onClick={() => setCurrentPage(currentPage -1)}
+            > <Icon as={GrFormPrevious} />
+          </button> : null 
+        }
+
+      {/* The first page button */}
+        { (currentPage > 5) ?
+          <button
+            onClick={() => setCurrentPage(1)}
+          >
+          1
+          </button> : null 
+        }
+
+      {/* The range of pages buttons */}
+        {pages.slice(rangeStart,rangeEnd).map((page, index) => {
+          return (
+          <button 
+            key={index} 
+            onClick={() => setCurrentPage(page)} 
+            className={page == currentPage ? "active" : ""}
+            > {page}
+          </button>
+          ); 
+          })
+        } 
+
+      {/* The last page button */}
+        { ((currentPage + 3) < totalPages) ?
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+          >
+          {totalPages}
+          </button> : null 
+        }
+
+      {/* The next button */}
+        { (currentPage < totalPages) ?
+          <button
+            onClick={() => setCurrentPage(currentPage +1)}
+            > <Icon as={GrFormNext} />
+          </button> : null 
+        }
     </div>
   )
 }

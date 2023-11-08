@@ -15,10 +15,8 @@ import {
     HStack,
     VStack,
     StackDivider,
-    InputRightAddon,
     InputLeftElement,
     Menu,
-    MenuItem,
     MenuButton,
     MenuList,
     MenuOptionGroup,
@@ -80,14 +78,7 @@ const Home: React.FC = () => {
         setShowSchools(true);
         setSelectedDistrict(district);
         
-
-        // const clickedQuery = district
-        // const demoDistrictSearch = await searchSchoolDistricts(clickedQuery)
-        // setDistrictSearch(demoDistrictSearch)
         console.log("District example 2:", districtSearch);
-
-        // const districtSchoolSearch = await searchSchools(schoolQuery, demoDistrictSearch[0].LEAID)
-        // setSchoolSearch(districtSchoolSearch)
         console.log("Schools in District", schoolSearch.length)
         
     }
@@ -115,10 +106,11 @@ const Home: React.FC = () => {
     }, [query, districtChecked, schoolChecked])
     
     return (
-        <Center padding="100px" height="132vh">
+        <Center padding="100px" height="90vh">
             <ScaleFade initialScale={0.9} in={true}>
                 <Card variant="rounded" borderColor="#F45746">
                     <Heading>School Data Finder</Heading>
+                    {/* <Text>Search for a district or school below</Text> */}
                     {/* <Text>
                         How would you utilize React.useEffect with the searchSchoolDistricts and searchSchools functions? <br />
                         Using <a href="https://chakra-ui.com/docs/principles" target="_blank">Chakra-UI</a> or your favorite UI toolkit, build an interface that allows the user to: <br />
@@ -134,13 +126,15 @@ const Home: React.FC = () => {
                         {searching ? <Spinner /> : <></>}< br />
                         <>
 
+                        {/* Our search bar */}
+
                         {!showSchools && <InputGroup>
                         <InputLeftElement pointerEvents='none'>
                             <Icon as={BsSearchHeart} />
                         </InputLeftElement>
                         <Input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." focusBorderColor="#F45746" />
                         <Menu>
-                            <MenuButton as={Button} colorScheme='#F45746'>Filters
+                            <MenuButton as={Button} colorScheme='#F45746' margin="0px 5px">Filters
                             </MenuButton>
                             <MenuList>
                                 <MenuOptionGroup defaultValue='dis' title='Filters' type='radio'>
@@ -154,7 +148,7 @@ const Home: React.FC = () => {
                         
                         {/* If we search by districts, we return the following: */}
 
-                        {districtChecked && <VStack> 
+                        {(districtChecked && query!="") && <VStack> 
                         {!showSchools && <>
                         <Heading>
                         <br /> {districtSearch.length} Districts Found <br />
@@ -211,7 +205,7 @@ const Home: React.FC = () => {
 
                         {/* If we search by schools, we return the following: */}
 
-                        {schoolChecked && <VStack>
+                        {(schoolChecked && query!="") && <VStack>
                             <Heading>
                            {schoolSearchBypass.length} Schools Found
                            </Heading>
@@ -227,8 +221,7 @@ const Home: React.FC = () => {
                                     return(
                                         <div className="cardBox">
                                         <b>{value.NAME}</b> <br/>
-                                        Located at {value.STREET},
-                                        {value.CITY}, {value.STATE}, {value.ZIP}
+                                        Located at {value.STREET}, {value.CITY}, {value.STATE}, {value.ZIP}
                                         </div>
                                         
                                     );

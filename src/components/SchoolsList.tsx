@@ -21,8 +21,7 @@ const SchoolsList = ({schoolSearch, districtSearch}) => {
                     return (
                         <div className="cardBox">
                      <b>{value.NAME}</b><br/>
-                    Located at {value.STREET},
-                     {value.CITY}, {value.STATE}, {value.ZIP}
+                    Located at {value.STREET}, {value.CITY}, {value.STATE}, {value.ZIP}
                     </div>
                     );
                     })} 
