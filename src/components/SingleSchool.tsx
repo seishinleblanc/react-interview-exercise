@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import "./design/SchoolsList.css";
 
+
 const SingleSchool = ({school}) => {
     return (
        <VStack>
