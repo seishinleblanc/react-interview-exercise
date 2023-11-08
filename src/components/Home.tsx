@@ -28,6 +28,7 @@ import { Card } from '@components/design/Card'
 import { searchSchoolDistricts, searchSchools, NCESDistrictFeatureAttributes, NCESSchoolFeatureAttributes } from "@utils/nces"
 import Pagination from "./Pagination"
 import SchoolsList from "./SchoolsList"
+import SingleSchool from "./SingleSchool"
 import "./design/SchoolsList.css";
 
 
@@ -43,6 +44,8 @@ const Home: React.FC = () => {
     const [schoolChecked, setSchoolChecked] = useState(false);
 
     const [showSchools, setShowSchools] = useState(false);
+    const [singleSchool, setSingleSchool] = React.useState<NCESSchoolFeatureAttributes[]>([]);
+    const [showSingleSchool, setShowSingleSchool] = useState(false);
 
     // The following are pagination related useStates and variables
     const [currentPage, setCurrentPage] = useState(1);
@@ -72,11 +75,25 @@ const Home: React.FC = () => {
         }
     }
 
+    // All button handlers located here
+
     const handleOnClick = async (district) => {
         setQuery(district);
         setSearching(false);
         setShowSchools(true);
         setSelectedDistrict(district);
+        
+        console.log("District example 2:", districtSearch);
+        console.log("Schools in District", schoolSearch.length)
+        
+    }
+
+    const handleSchoolOnClick = (school) => {
+        setSingleSchool(school);
+        setSearching(false);
+        setShowSingleSchool(true);
+        setSchoolChecked(false);
+        
         
         console.log("District example 2:", districtSearch);
         console.log("Schools in District", schoolSearch.length)
@@ -96,7 +113,15 @@ const Home: React.FC = () => {
 
     const handleReturnToSearch = () => {
         setShowSchools(false);
+        setShowSingleSchool(false);
         setCurrentPage(1);
+    }
+
+    const handleReturnToSearchSchools = () => {
+        setShowSchools(false);
+        setShowSingleSchool(false);
+        setCurrentPage(1);
+        setSchoolChecked(true);
     }
 
     useEffect(() => {
@@ -217,11 +242,16 @@ const Home: React.FC = () => {
                             spacing={1}
                             align='center'
                             > 
-                            {currentSchools.map((value) => {
+                            {currentSchools.map((value, index) => {
                                     return(
                                         <div className="cardBox">
+                                        <button
+                                        key={index}
+                                        onClick={(school) => handleSchoolOnClick(value)}
+                                        >
                                         <b>{value.NAME}</b> <br/>
                                         Located at {value.STREET}, {value.CITY}, {value.STATE}, {value.ZIP}
+                                        </button>
                                         </div>
                                         
                                     );
@@ -236,7 +266,16 @@ const Home: React.FC = () => {
                             currentPage={currentPage} 
                            />
                         </VStack> }
-
+                        <VStack>
+                                {showSingleSchool && <SingleSchool 
+                                school={singleSchool}
+                                />}
+                                {showSingleSchool && <Button
+                                onClick={handleReturnToSearchSchools}
+                                >
+                                Return to Search
+                                </Button> }
+                        </VStack>
 
                         </>
                     </Text>
