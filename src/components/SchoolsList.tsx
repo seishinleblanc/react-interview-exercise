@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { 
     Heading,
     VStack, 
@@ -6,10 +6,25 @@ import {
     Text 
 } from "@chakra-ui/react";
 import "./design/SchoolsList.css";
+import SingleSchool from "./SingleSchool"
+
+
 
 const SchoolsList = ({schoolSearch, districtSearch}) => {
+    const [showAllSchools, setShowAllSchools] = useState(true);
+    const [showSingleSchool, setShowSingleSchool] = useState(false);
+    const [school, setSchool] = useState("");
+
+    const handleSchoolOnClick = (schoolName) => {
+        setSchool(schoolName);
+        setShowSingleSchool(true);
+        setShowAllSchools(false)
+    }
+    
     return (
-       <VStack>
+        <>
+        {/* Render for all school within a district */}
+       {showAllSchools && <VStack>
        <Heading>{districtSearch}</Heading>
         <Text>Schools within District:</Text>
         <VStack
@@ -17,17 +32,28 @@ const SchoolsList = ({schoolSearch, districtSearch}) => {
             spacing={1}
             align='center'
         > 
-        {schoolSearch.map((value) => {
+        {schoolSearch.map((value, index) => {
                     return (
-                        <div className="cardBox">
+                    <div className="cardBox">
+                    <button
+                        key={index}
+                        onClick={(schoolName) => handleSchoolOnClick(value)}
+                        >
                      <b>{value.NAME}</b><br/>
-                    Located at {value.STREET},
-                     {value.CITY}, {value.STATE}, {value.ZIP}
+                    Located at {value.STREET}, {value.CITY}, {value.STATE}, {value.ZIP}
+                    </button>
                     </div>
                     );
                     })} 
         </VStack>
-        </VStack>
+        </VStack>}
+
+        {/* Render for a single school */}
+        {showSingleSchool && <SingleSchool
+        school={school} 
+        />}
+        </>
+        
 )
 }
 

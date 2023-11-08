@@ -7,18 +7,13 @@ import {
     Icon,
     Input,
     ScaleFade,
-    OrderedList,
     Divider,
-    ListItem,
     Spinner,
     InputGroup, // Some Chakra components that might be usefull
-    HStack,
     VStack,
     StackDivider,
-    InputRightAddon,
     InputLeftElement,
     Menu,
-    MenuItem,
     MenuButton,
     MenuList,
     MenuOptionGroup,
@@ -30,6 +25,7 @@ import { Card } from '@components/design/Card'
 import { searchSchoolDistricts, searchSchools, NCESDistrictFeatureAttributes, NCESSchoolFeatureAttributes } from "@utils/nces"
 import Pagination from "./Pagination"
 import SchoolsList from "./SchoolsList"
+import SingleSchool from "./SingleSchool"
 import "./design/SchoolsList.css";
 
 
@@ -45,6 +41,8 @@ const Home: React.FC = () => {
     const [schoolChecked, setSchoolChecked] = useState(false);
 
     const [showSchools, setShowSchools] = useState(false);
+    const [singleSchool, setSingleSchool] = React.useState<NCESSchoolFeatureAttributes[]>([]);
+    const [showSingleSchool, setShowSingleSchool] = useState(false);
 
     // The following are pagination related useStates and variables
     const [currentPage, setCurrentPage] = useState(1);
@@ -74,20 +72,27 @@ const Home: React.FC = () => {
         }
     }
 
+    // All button handlers located here
+
     const handleOnClick = async (district) => {
         setQuery(district);
         setSearching(false);
         setShowSchools(true);
         setSelectedDistrict(district);
         
-
-        // const clickedQuery = district
-        // const demoDistrictSearch = await searchSchoolDistricts(clickedQuery)
-        // setDistrictSearch(demoDistrictSearch)
         console.log("District example 2:", districtSearch);
+        console.log("Schools in District", schoolSearch.length)
+        
+    }
 
-        // const districtSchoolSearch = await searchSchools(schoolQuery, demoDistrictSearch[0].LEAID)
-        // setSchoolSearch(districtSchoolSearch)
+    const handleSchoolOnClick = (school) => {
+        setSingleSchool(school);
+        setSearching(false);
+        setShowSingleSchool(true);
+        setSchoolChecked(false);
+        
+        
+        console.log("District example 2:", districtSearch);
         console.log("Schools in District", schoolSearch.length)
         
     }
@@ -105,7 +110,15 @@ const Home: React.FC = () => {
 
     const handleReturnToSearch = () => {
         setShowSchools(false);
+        setShowSingleSchool(false);
         setCurrentPage(1);
+    }
+
+    const handleReturnToSearchSchools = () => {
+        setShowSchools(false);
+        setShowSingleSchool(false);
+        setCurrentPage(1);
+        setSchoolChecked(true);
     }
 
     useEffect(() => {
@@ -115,24 +128,16 @@ const Home: React.FC = () => {
     }, [query, districtChecked, schoolChecked])
     
     return (
-        <Center padding="100px" height="132vh">
+        <Center padding="100px" height="90vh">
             <ScaleFade initialScale={0.9} in={true}>
                 <Card variant="rounded" borderColor="#F45746">
                     <Heading>School Data Finder</Heading>
-                    {/* <Text>
-                        How would you utilize React.useEffect with the searchSchoolDistricts and searchSchools functions? <br />
-                        Using <a href="https://chakra-ui.com/docs/principles" target="_blank">Chakra-UI</a> or your favorite UI toolkit, build an interface that allows the user to: <br />
-                        <OrderedList>
-                            <ListItem>Search for a district</ListItem>
-                            <ListItem>Search for a school within the district (or bypass district filter)</ListItem>
-                            <ListItem>View all returned data in an organized way</ListItem>
-                        </OrderedList>
-                    </Text> */}
                     <Divider margin={4} />
                     <Text>
-                        {/* Check the console for example of returned data. <b>Happy coding!</b>< br /> */}
                         {searching ? <Spinner /> : <></>}< br />
                         <>
+
+                        {/* Our search bar */}
 
                         {!showSchools && <InputGroup>
                         <InputLeftElement pointerEvents='none'>
@@ -140,7 +145,7 @@ const Home: React.FC = () => {
                         </InputLeftElement>
                         <Input value={query} onChange={e => setQuery(e.target.value)} type="search" className="search_input" placeholder="Search..." focusBorderColor="#F45746" />
                         <Menu>
-                            <MenuButton as={Button} colorScheme='#F45746'>Filters
+                            <MenuButton as={Button} colorScheme='#F45746' margin="0px 5px">Filters
                             </MenuButton>
                             <MenuList>
                                 <MenuOptionGroup defaultValue='dis' title='Filters' type='radio'>
@@ -154,7 +159,7 @@ const Home: React.FC = () => {
                         
                         {/* If we search by districts, we return the following: */}
 
-                        {districtChecked && <VStack> 
+                        {(districtChecked && query!="") && <VStack> 
                         {!showSchools && <>
                         <Heading>
                         <br /> {districtSearch.length} Districts Found <br />
@@ -211,7 +216,7 @@ const Home: React.FC = () => {
 
                         {/* If we search by schools, we return the following: */}
 
-                        {schoolChecked && <VStack>
+                        {(schoolChecked && query!="") && <VStack>
                             <Heading>
                            {schoolSearchBypass.length} Schools Found
                            </Heading>
@@ -223,12 +228,16 @@ const Home: React.FC = () => {
                             spacing={1}
                             align='center'
                             > 
-                            {currentSchools.map((value) => {
+                            {currentSchools.map((value, index) => {
                                     return(
                                         <div className="cardBox">
+                                        <button
+                                        key={index}
+                                        onClick={(school) => handleSchoolOnClick(value)}
+                                        >
                                         <b>{value.NAME}</b> <br/>
-                                        Located at {value.STREET},
-                                        {value.CITY}, {value.STATE}, {value.ZIP}
+                                        Located at {value.STREET}, {value.CITY}, {value.STATE}, {value.ZIP}
+                                        </button>
                                         </div>
                                         
                                     );
@@ -241,9 +250,20 @@ const Home: React.FC = () => {
                             resultsPerPage={resultsPerPage} 
                             setCurrentPage={setCurrentPage} 
                             currentPage={currentPage} 
-                           />
+                           /> 
                         </VStack> }
 
+                        {/* To show a single school */}
+                        <VStack>
+                                {showSingleSchool && <SingleSchool 
+                                school={singleSchool}
+                                />}
+                                {showSingleSchool && <Button
+                                onClick={handleReturnToSearchSchools}
+                                >
+                                Return to Search
+                                </Button> }
+                        </VStack>
 
                         </>
                     </Text>
