@@ -6,6 +6,7 @@ import {
     Text 
 } from "@chakra-ui/react";
 import "./design/SchoolsList.css";
+import Map from "./Map"
 
 
 const SingleSchool = ({school}) => {
@@ -23,6 +24,9 @@ const SingleSchool = ({school}) => {
          </div>
                     
         </VStack>
+        <Map
+        schoolLat={school.LAT}
+        schoolLong={school.LON} />
         </VStack>
 )
 }
