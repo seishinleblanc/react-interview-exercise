@@ -1,12 +1,13 @@
 import React from 'react'
 
-const SchoolsList = ({schoolSearch}) => {
-  return (
-    <>
+const SchoolsList = ({schoolSearch, districtSearch}) => {
+    return (
+       <> <h1>District: {districtSearch}</h1>
+        <h1>Schools within District:</h1>
         {schoolSearch.map((value) => {
                     return (
                         <>
-                    <h1>{value.NAME}</h1>
+                    <h3>{value.NAME}</h3>
                     </>
                     );
                     })} 
