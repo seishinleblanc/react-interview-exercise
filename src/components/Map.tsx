@@ -4,7 +4,7 @@ import { googleMapsKey } from "@utils/maps"
 
 const containerStyle = {
   width: '50vw',
-  height: '50vh'
+  height: '40vh'
 };
 
 
