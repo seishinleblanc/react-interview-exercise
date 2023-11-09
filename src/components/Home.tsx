@@ -204,6 +204,7 @@ const Home: React.FC = () => {
                             >
                                 Return to Search
                             </Button> }
+                            <Divider margin={4} />
 
                             {showSchools && <Pagination 
                             totalResults={schoolSearch.length} 
