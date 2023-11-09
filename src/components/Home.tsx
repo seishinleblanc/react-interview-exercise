@@ -74,7 +74,7 @@ const Home: React.FC = () => {
 
     // All button handlers located here
 
-    const handleOnClick = async (district) => {
+    const handleOnClick = async (district: React.SetStateAction<string>) => {
         setQuery(district);
         setSearching(false);
         setShowSchools(true);
@@ -85,7 +85,7 @@ const Home: React.FC = () => {
         
     }
 
-    const handleSchoolOnClick = (school) => {
+    const handleSchoolOnClick = (school: NCESSchoolFeatureAttributes | React.SetStateAction<NCESSchoolFeatureAttributes[]>) => {
         setSingleSchool(school);
         setSearching(false);
         setShowSingleSchool(true);

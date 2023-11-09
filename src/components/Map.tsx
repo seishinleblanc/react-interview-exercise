@@ -13,8 +13,6 @@ function Map({schoolLat, schoolLong}) {
         id: 'google-map-script',
         googleMapsApiKey: googleMapsKey
     })
-
-    console.log(schoolLat)
     
     const [map, setMap] = React.useState(null)
     const center = {
